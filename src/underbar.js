@@ -28,10 +28,12 @@ var _ = { };
 	_.last = function ( array, n ) {
 		if ( n == undefined ) {
 			return array.slice( -1 )[0];
-		} else if ( n > 0 ) {
-			return array.slice( -n )
 		} else {
-			return [];
+			if ( n > 0 ) {
+				return array.slice( -n )
+			} else {
+				return [];
+			}
 		}
 	};
 
@@ -132,7 +134,8 @@ var _ = { };
 	};
 
 	// Calls the method named by methodName on each value in the list.
-	_.invoke = function ( list, methodName, args ) {  // TODO: double check handling of args
+	_.invoke = function ( list, methodName, args ) {
+		// TODO: double check handling of args
 		var result = [];
 		args = args || [];
 		if ( typeof methodName === 'string' ) {
@@ -161,7 +164,6 @@ var _ = { };
 	//   }, 0); // should be 6
 	//
 	_.reduce = function ( collection, iterator, initialValue ) {
-
 		var result = initialValue || 0;
 
 		_.forEach( collection, function ( item ) {
@@ -204,9 +206,11 @@ var _ = { };
 	// provided, provide a default one
 	_.some = function ( collection, iterator ) {
 		// TIP: There's a very clever way to re-use every() here.
-		return !(_.every( collection, function ( item ) {
-			return iterator ? !iterator( item ) : !item;
-		} ));
+		return !(
+			_.every( collection, function ( item ) {
+				return iterator ? !iterator( item ) : !item;
+			} )
+			);
 	};
 
 	/**
@@ -287,7 +291,8 @@ var _ = { };
 	// Memoize should return a function that when called, will check if it has
 	// already computed the result for the given argument and return that value
 	// instead if possible.
-	_.memoize = function ( func ) {   // TODO: THIS AIN'T RIGHT....NEED TO REVISIT
+	_.memoize = function ( func ) {
+		// TODO: THIS AIN'T RIGHT....NEED TO REVISIT
 		var cache = [], res;
 		return function ( param ) {
 			if ( cache[param] !== undefined ) {
@@ -362,13 +367,13 @@ var _ = { };
 	// _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
 	_.zip = function () {
 
-		var argArray = Array.prototype.slice.call( arguments ), maxLength = Math.max.apply( null, _.map( argArray,
-		                                                                                                 function ( item ) {
-			                                                                                                 return item.length;
-		                                                                                                 } ) ), result =
-			[];
+		var argArray = Array.prototype.slice.call( arguments );
+		var maxLength = Math.max.apply( null, _.map( argArray, function ( item ) {
+			return item.length;
+		} ) ), result = [];
 
-		for ( j = 0; j < argArray.length; j++ ) { // TODO - this seems very clunky. Need to think of a better way.
+		for ( j = 0; j < argArray.length; j++ ) {
+			// TODO - this seems very clunky. Need to think of a better way.
 			result.push( [] );
 		}
 		for ( var i = 0; i < maxLength; i++ ) {
@@ -376,9 +381,6 @@ var _ = { };
 				result[j].splice( i, 0, argArray[i][j] )
 			}
 		}
-		/*        _.each(argArray, function (item) { // leftover junk. not needed.
-		 item.length = maxLength;
-		 });*/
 		return result;
 	};
 
@@ -404,7 +406,7 @@ var _ = { };
 	// every item shared between all the passed-in arrays.
 	_.intersection = function () {
 		var argArray = Array.prototype.slice.call( arguments, 0,
-		                                           1 )[0], refArray = Array.prototype.slice.call( arguments, 1 );
+			1 )[0], refArray = Array.prototype.slice.call( arguments, 1 );
 
 		return _.filter( argArray, function ( val ) {
 			return _.every( refArray, function ( item ) {
@@ -417,7 +419,7 @@ var _ = { };
 	// Only the elements present in just the first array will remain.
 	_.difference = function ( array ) {
 		var argArray = Array.prototype.slice.call( arguments, 0,
-		                                           1 )[0], refArray = Array.prototype.slice.call( arguments, 1 );
+			1 )[0], refArray = Array.prototype.slice.call( arguments, 1 );
 
 		return _.filter( argArray, function ( val ) {
 			return _.every( refArray, function ( item ) {
@@ -425,6 +427,19 @@ var _ = { };
 			} );
 		} );
 	};
+
+	// Bind a function so that it is always called in the given context
+	// func() will be equivalent to context.func()
+	_.bind = function ( func, context ) {
+
+		return function ( args ) {
+			if ( Array.isArray( args ) ) {
+				return func.apply( context, args );
+			} else {
+				return func.call( context, args );
+			}
+		}
+	}
 
 	/**
 	 * MEGA EXTRA CREDIT
